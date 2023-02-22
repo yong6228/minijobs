@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.info.dao.EngineerlistDao">
+
+	<!-- 그룹코드 목록 조회 -->
+	
+	<select id="listEngineerCod" resultType="kr.happyjob.study.info.model.Engineerlist">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.listEngineerCod*/
+		SELECT	
+				n.loginID as loginID,
+				n.name as name,
+				n.user_contents as user_contents,
+				n.user_hope_area1 as user_hope_area1,
+				n.user_hope_area2 as user_hope_area2,
+				n.user_hope_area3 as user_hope_area3,
+				n.user_grade as user_grade,
+				n.state_cd as state_cd,
+				k.detail_code as detail_code							
+			
+		FROM  tb_userinfo n
+		INNER JOIN tb_userskill k
+		where n.loginID = k.loginID
+		
+		<!-- 3개 변수는 인식을 못함 1개 값 user_hope_area1만 인식함 -->
+		<if test="(areaall != null) and (!areaall.equals(''))">
+		    and ( 
+			          n.user_hope_area1 = #{areaall}
+			       or n.user_hope_area2 = #{areaall}
+			       or n.user_hope_area3 = #{areaall}
+		        )
+		</if>
+		<if test="(sklall != null) and (!sklall.equals(''))">
+		    and n.user_grade = #{sklall} 
+		</if>
+		<if test="(name != null) and (!name.equals(''))">
+		    and n.name LIKE CONCAT('%', #{name}, '%') 
+		</if>
+		
+		LIMIT #{pageIndex}, #{pageSize}
+		
+	</select>
+	
+	<!-- 그룹코드 목록 총 갯수 조회 -->
+	
+	<select id="countListEngineerCod" resultType="int">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.countListEngineerCod*/
+		SELECT	count(*) as cnt
+		FROM  tb_userinfo
+		<where>
+		<if test="(areaall != null) and (!areaall.equals(''))">
+		    and ( 
+			          user_hope_area1 = #{areaall}
+			       or user_hope_area2 = #{areaall}
+			       or user_hope_area3 = #{areaall}
+		        )
+		</if>
+		<if test="(sklall != null) and (!sklall.equals(''))">
+		    and user_grade = #{sklall} 
+		</if>			
+		</where>	
+					
+	</select>
+	
+	<select id="listEngineerAll" resultType="kr.happyjob.study.info.model.Engineerlist">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.Engineerlist*/
+		SELECT  loginID,
+				name,
+				gender_cd,
+				birthday,
+				user_email,
+				user_zipcode,
+				user_address,
+				user_dt_address,
+				user_tel1,
+				user_tel2,
+				user_tel3,
+				user_hope_work,
+				career_yn,
+				career_mm,
+				salary,
+				consult_yn,
+				user_contents,
+				user_hope_area1,
+				user_hope_area2,
+				user_hope_area3,
+				user_grade,
+				user_describe,
+				singular_facts,
+				state_cd
+
+				
+		FROM  tb_userinfo
+		WHERE loginID = #{registerId}
+		
+	</select>
+	
+	<select id="listskill" resultType="kr.happyjob.study.info.model.Engineerskill">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.Engineerskill*/
+		SELECT  group_code,
+				detail_code
+				
+		FROM  tb_userskill
+		WHERE loginID = #{registerId}
+		
+	</select>
+	
+	<select id="listcategory" resultType="kr.happyjob.study.info.model.Engineercategory">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.Engineercategory*/
+		SELECT  category
+				
+		FROM  tb_usercart
+		WHERE loginID = #{registerId}
+		
+	</select>
+	
+	
+	<!-- 그룹코드 저장 -->
+	<insert id="insertEngineerCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.insertEngineerCod*/
+		INSERT INTO tb_userinfo
+		(
+				loginID,
+				name,
+				gender_cd,
+				birthday,
+				user_email,
+				user_zipcode,
+				user_address,
+				user_dt_address,
+				user_tel1,
+				user_tel2,
+				user_tel3,
+				user_hope_work,
+				career_yn,
+				career_mm,
+				salary,
+				consult_yn,
+				user_contents,
+				user_hope_area1,
+				user_hope_area2,
+				user_hope_area3,
+				user_grade,
+				user_describe,
+				singular_facts,
+				state_cd	
+		)
+		VALUES
+		(
+				#{loginID}
+			,	#{name}
+			,	#{gender_cd}
+			,   #{birthday}
+			,   #{user_email}
+			,	#{user_zipcode}
+			,	#{user_address}
+			,	#{user_dt_address}
+			,	#{user_tel1}
+			,	#{user_tel2}
+			,	#{user_tel3}
+			,	#{user_hope_work}
+			,	#{career_yn}
+			,	#{career_mm}
+			,	#{salary}
+			,	#{consult_yn}
+			,	#{user_describe}
+			,	#{user_hope_area1}
+			,	#{user_hope_area2}
+			,	#{user_hope_area3}
+			,	#{user_grade}
+			,	#{user_contents}
+			,	#{singular_facts}
+			,   #{state_cd}
+		)		
+	</insert>
+	
+	<!-- 그룹코드 수정 -->
+	<update id="updateEngineerCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.updateEngineerCod*/
+		UPDATE tb_userinfo  SET
+				name = #{name}
+			,   gender_cd = #{gender_cd}
+			,   birthday = #{birthday}
+			,	user_email = #{user_email}
+			,	user_zipcode = #{user_zipcode}
+			,	user_address = #{user_address}
+			,	user_dt_address = #{user_dt_address}
+			,	user_tel1 = #{user_tel1}
+			,	user_tel2 = #{user_tel2}
+			,	user_tel3 = #{user_tel3}
+			,	user_hope_work = #{user_hope_work}
+			,	career_yn = #{career_yn}
+			,	career_mm = #{career_mm}
+			,	salary = #{salary}
+			,	consult_yn = #{consult_yn}
+			,	user_contents = #{user_describe}
+			,	user_hope_area1 = #{user_hope_area1}
+			,	user_hope_area2 = #{user_hope_area2}
+			,	user_hope_area3 = #{user_hope_area3}
+			,	user_hope_area3 = #{user_hope_area3}
+			,	user_grade = #{user_grade}
+			,	user_describe = #{user_contents}
+			,	singular_facts = #{singular_facts}
+			,   state_cd = #{state_cd}
+			
+		WHERE loginID = #{loginID}
+	</update>
+	<insert id="insertSkillCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.insertSkillCod*/
+		INSERT INTO tb_userskill
+		( 
+		  loginID,
+		  detail_code,
+		  group_code
+		) 
+		VALUES
+		( 
+		  #{loginID},
+		  #{detail_code},
+		  #{group_code}		  
+		)
+	</insert>
+	<update id="updateSkillCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.updateSkillCod*/
+		UPDATE tb_userskill  SET
+				detail_code = #{detail_code}
+			,   group_code = #{group_code}			
+			
+		WHERE loginID = #{loginID}
+	</update>
+	<delete id="deleteSkillCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.deleteSkillCod*/
+		DELETE FROM tb_userskill WHERE loginID = #{loginID}
+	</delete>
+	
+	<insert id="insertCategoryCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.insertCategoryCod*/
+		INSERT INTO tb_usercart
+		( 
+		  loginID,
+		  category
+		) 
+		VALUES
+		( 
+		  #{loginID},
+		  #{category}		  
+		)
+	</insert>
+	<update id="updateCategoryCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.updateCategoryCod*/
+		UPDATE tb_usercart  SET
+				category = #{category}			
+			
+		WHERE loginID = #{loginID}
+	</update>
+	<delete id="deleteCategoryCod">
+		/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.deleteCategoryCod*/
+		DELETE FROM tb_usercart WHERE loginID = #{loginID}
+	</delete>
+	
+	
+	
+	
+	
+</mapper>

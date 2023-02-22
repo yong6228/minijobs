@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.info.dao.ProjectlistDao">
+
+<select id="listProjectCod" resultType="kr.happyjob.study.info.model.Projectlist">
+/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.listProjectCod*/
+	SELECT
+		pi.projectID,
+		pi.loginID,
+		pi.projectname,
+		pi.corname,
+		(	SELECT 
+				dc.detail_name 
+			FROM tb_detail_code dc 
+			WHERE dc.group_code = 'areaCD' 
+				AND dc.detail_code  = pi.area) AS area,
+		(	SELECT 
+				dc.detail_name 
+			FROM tb_detail_code dc 
+			WHERE dc.group_code = 'JOBCD' 
+				AND dc.detail_code  = pi.job) AS job,
+		(	SELECT 
+				dc.detail_name 
+			FROM tb_detail_code dc 
+			WHERE dc.group_code = 'industryCD' 
+				AND dc.detail_code  = pi.industry) AS industry,
+		pi.workstart,
+		pi.workend,
+		pi.recvstart,
+		pi.recvend,
+		ui.corp_name as wname
+	FROM tb_pjinfo pi INNER JOIN tb_userinfo ui ON ui.loginID = pi.loginID
+	<where>
+		<if test="(areaall != null) and (!areaall.equals(''))">
+		    and pi.area = #{areaall}
+		</if>
+		<if test="(joball != null) and (!joball.equals(''))">
+		    and pi.job = #{joball}
+		</if>
+		<if test="(industryall != null) and (!industryall.equals(''))">
+		 	and pi.industry = #{industryall}
+		</if>
+	</where>
+</select>
+
+<select id="countListProjectCod" resultType="int">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.countListProjectCod*/
+	SELECT count(1) as cnt
+	FROM 	tb_pjinfo
+	<where>
+		<if test="(areaall != null) and (!areaall.equals(''))">
+		    and area = #{areaall}
+		</if>
+		<if test="(joball != null) and (!joball.equals(''))">
+		    and job = #{joball}
+		</if>
+		<if test="(industryall != null) and (!industryall.equals(''))">
+		 	and industry = #{industryall}
+		</if>
+	</where>
+</select>
+
+<!-- 프로젝트 조회, 입력, 수정, 삭제 -->
+<select id="listProjectAll" resultType="kr.happyjob.study.info.model.Projectlist">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.listProjectAll*/
+	SELECT 
+		pi.projectID,
+		pi.loginID,
+		pi.projectname,
+		pi.corname,
+		pi.area,
+		pi.job,
+		pi.industry,
+		pi.swtype,
+		pi.first,
+		pi.mid,
+		pi.high,
+		pi.special,
+		DATE_FORMAT( pi.workstart , '%Y-%m-%d' ) as workstart,
+		DATE_FORMAT( pi.workend , '%Y-%m-%d' ) as workend,
+		DATE_FORMAT( pi.recvstart , '%Y-%m-%d' ) as recvstart,
+		DATE_FORMAT( pi.recvend , '%Y-%m-%d' ) as recvend,
+		pi.note,
+		pi.prime,
+		pi.etc,
+		pi.workarea,
+		pi.workareadetail,
+		pi.notebookyn,
+		pi.houseyn,
+		pi.foodyn,
+		ui.corp_name as wname
+	FROM tb_pjinfo pi INNER JOIN tb_userinfo ui ON ui.loginID = pi.loginID
+	WHERE pi.projectID = #{projectID}
+</select>
+
+<insert id="insertProjectCod">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.insertProjectCod*/
+	<selectKey resultType="string" keyProperty="projectID" order="BEFORE">
+	    SELECT IFNULL(MAX(projectID),0) + 1  FROM tb_pjinfo
+	</selectKey>
+	INSERT INTO tb_pjinfo 
+	(
+		projectID,
+		loginID,
+		projectname,
+		corname,
+		area,
+		job,
+		industry,
+		swtype,
+		first,
+		mid,
+		high,
+		special,
+		workstart,
+		workend,
+		recvstart,
+		recvend,
+		note,
+		prime,
+		etc,
+		workarea,
+		workareadetail,
+		notebookyn,
+		houseyn,
+		foodyn
+	)
+	VALUES
+	(
+		#{projectID},
+		#{loginID},
+		#{projectname},
+		#{corname},
+		#{rgareaall},
+		#{rgjoball},
+		#{rgindustryall},
+		#{swcdall},
+		#{first},
+		#{mid},
+		#{high},
+		#{special},
+		#{workstart},
+		#{workend},
+		#{recvstart},
+		#{recvend},
+		#{note},
+		#{prime},
+		#{etc},
+		#{workareaall},
+		#{workareadetail},
+		#{rgnotebookyn},
+		#{rghouseyn},
+		#{rgfoodyn}
+	)
+</insert>
+
+<update id="updateProjectCod">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.updateProjectCod*/
+	UPDATE tb_pjinfo
+	SET
+		projectname = #{projectname},
+		corname = #{corname},
+		area = #{rgareaall},
+		job = #{rgjoball},
+		industry = #{rgindustryall},
+		swtype = #{swcdall},
+		first = #{first},
+		mid = #{mid},
+		high = #{high},
+		special = #{special},
+		workstart = #{workstart},
+		workend = #{workend},
+		recvstart = #{recvstart},
+		recvend = #{recvend},
+		note = #{note},
+		prime = #{prime},
+		etc = #{etc},
+		workarea = #{workareaall},
+		workareadetail = #{workareadetail},
+		notebookyn = #{rgnotebookyn},
+		houseyn = #{rghouseyn},
+		foodyn = #{rgfoodyn}
+	WHERE loginID = #{loginID} AND projectID = #{projectID}
+</update>
+
+<delete id="deleteProjectCod">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.deleteProjectCod*/
+	DELETE FROM tb_pjinfo 
+	WHERE loginID = #{loginID} AND projectID = #{projectID}
+</delete>
+
+<!-- 프로젝트 스킬 조회, 입력, 수정, 삭제 -->
+<select id="listskill" resultType="kr.happyjob.study.info.model.Projectskill">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.Projectskill*/
+		SELECT  
+			group_code,
+			detail_code
+		FROM  tb_pjskill
+		WHERE projectID = #{projectID}
+</select>
+
+<insert id="insertSkillCod">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.insertSkillCod*/
+	INSERT INTO tb_pjskill
+	( 
+	  projectID,
+	  detail_code,
+	  group_code
+	) 
+	VALUES
+	( 
+	  #{projectID},
+	  #{detail_code},
+	  #{group_code}		  
+	)
+</insert>
+	
+<update id="updateSkillCod">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.updateSkillCod*/
+	UPDATE tb_pjskill  
+	SET
+		detail_code = #{detail_code},
+		group_code = #{group_code}			
+	WHERE projectID = #{projectID}
+</update>
+
+<delete id="deleteSkillCod">
+	/*kr.kosmo.jobkorea.info.dao.ProjectlistDao.deleteSkillCod*/
+	DELETE FROM tb_pjskill 
+	WHERE projectID = #{projectID}
+</delete>
+
+<!-- 프로젝트 면접 조회, 입력, 수정, 삭제 -->
+<select id="listInterview" resultType="kr.happyjob.study.info.model.ProjectInterview">
+	/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.ProjectInterview*/
+	SELECT  
+		interviewtype
+	FROM  tb_interview
+	WHERE projectID = #{projectID}
+</select>
+
+<insert id="insertInterviewCod" >
+	/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.insertInterviewCod*/
+	INSERT INTO tb_interview (
+		projectID,
+		interviewtype
+	) 
+	VALUES
+	(
+		#{projectID},
+		#{interviewtype}
+	)
+</insert>
+
+<update id="updateInterviewCod">
+	/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.updateInterviewCod*/
+	UPDATE tb_interview  
+	SET
+		interviewtype = #{interviewtype}				
+	WHERE projectID = #{projectID}
+</update>
+
+<delete id="deleteInterviewCod">
+	/*kr.kosmo.jobkorea.info.dao.EngineerlistDao.deleteInterviewCod*/
+	DELETE FROM tb_interview 
+	WHERE projectID = #{projectID}
+</delete>
+</mapper>

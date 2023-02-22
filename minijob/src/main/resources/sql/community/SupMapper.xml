@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.community.dao.SubDao">
+
+<!-- 자료실 전체 목록 조회 -->
+<select id="supListAll" resultType="kr.happyjob.study.community.model.SubModel">
+
+		SELECT 
+		 	su.sup_title as supTitle
+		,	su.sup_id as supId  	
+		,	su.sup_regdate as supRegdate
+		,	ui.name
+		FROM tb_sup su JOIN tb_userinfo ui ON su.loginID = ui.loginID 
+		<where>
+		<if test="(title != null) and (!title.equals(''))">
+		 and su.sup_title LIKE CONCAT('%',#{title},'%')
+		</if>
+			<if test="(from_date != null) and (!from_date.equals(''))">
+		 and su.sup_regdate<![CDATA[>=]]>STR_TO_DATE(#{from_date},'%Y-%m-%d')
+		</if>
+			<if test="(to_date != null) and (!to_date.equals(''))">
+		 and su.sup_regdate<![CDATA[<=]]>STR_TO_DATE(#{to_date},'%Y-%m-%d')
+		</if>
+		</where>
+		ORDER BY su.sup_id DESC
+		LIMIT #{pageIndex}, #{pageSize}
+</select>
+
+<!-- 자료실 총 갯수 조회 -->
+
+<select id="supTotalCnt" resultType="int">
+
+		SELECT
+				count(1)
+		  FROM tb_sup
+				<where>
+		<if test="(title != null) and (!title.equals(''))">
+		 and sup_title LIKE CONCAT('%',#{title},'%')
+		</if>
+			<if test="(from_date != null) and (!from_date.equals(''))">
+		 and sup_regdate<![CDATA[>=]]>STR_TO_DATE(#{from_date},'%Y-%m-%d')
+		</if>
+			<if test="(to_date != null) and (!to_date.equals(''))">
+		 and sup_regdate<![CDATA[<=]]>STR_TO_DATE(#{to_date},'%Y-%m-%d')
+		</if>
+		</where>
+		ORDER BY sup_id DESC
+</select>
+
+<!-- 자료실 상세 조회 -->
+
+<select id="supDetail" resultType="kr.happyjob.study.community.model.SubModel">
+
+			SELECT 
+						sup_title as supTitle
+					,	sup_id as supId	
+					,	sup_content as supContent
+					,	sup_filename as supFilename
+					,	sup_filepath as supFilepath
+					,	sup_filesize as supFilesize	
+					,   loginID
+				FROM tb_sup
+				WHERE sup_id = #{supId}
+</select>
+
+<!-- 자료실 신규등록 -->
+<insert id="supCreate" parameterType="java.util.Map">
+<selectKey resultType="string" order="BEFORE" keyProperty="supId">
+		SELECT IFNULL(MAX(sup_id),0)+1
+		FROM tb_sup
+</selectKey>
+
+		INSERT 
+			INTO tb_sup
+							(
+								sup_id
+							,	 loginID
+							, 	sup_title
+							,	sup_content
+							,	sup_regdate
+							,	sup_filename
+							,	sup_filepath
+							,	sup_filesize 
+							
+							)
+		VALUES
+						(
+						#{supId}
+					,	#{swriter}
+					,	#{supTitle}
+					,	#{supContent}
+					,	NOW()
+ 					,	#{file.file_nm}
+					,	#{file.file_size}
+					,	#{file.file_loc}
+						)
+</insert>
+
+<!-- 자료실 목록 수정 -->
+<update id="supUpdate">
+
+		UPDATE tb_sup
+			   SET
+			 	sup_title = #{supTitle}
+			,	sup_content = #{supContent}
+		WHERE sup_id = #{supId}
+</update>
+
+<!-- 자료실 목록 삭제 -->
+<delete id="supDelete">
+
+		DELETE 
+		   FROM tb_sup
+		WHERE sup_id = #{supId}
+
+</delete>
+
+</mapper>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.happyjob.study.community.dao.FreeBoardDao">
+
+<!-- 자유게시판 전체조회 -->
+<select id="boardList" resultType="kr.happyjob.study.community.model.FreeBoardModel">
+
+		SELECT 
+				fb.free_title as freeTitle
+			,	fb.free_id as freeID	
+			,	fb.free_regdate as freeRegdate
+			,	(
+					SELECT ui.name
+					FROM tb_userinfo ui
+					WHERE ui.loginID = fb.loginID
+				) as name
+			FROM tb_freeBoard fb
+			<where>
+			<if test="(title != null) and (!title.equals(''))">
+			and fb.free_title LIKE CONCAT('%',#{title},'%')
+			</if>
+			<if test ="(from_date != null) and (!from_date.equals(''))">
+			    and fb.free_regdate  <![CDATA[>=]]> STR_TO_DATE(#{from_date}, '%Y-%m-%d')   
+			</if>			
+			<if test ="(to_date != null) and (!to_date.equals(''))">
+			    and fb.free_regdate  <![CDATA[<=]]> STR_TO_DATE(#{to_date}, '%Y-%m-%d')   
+			</if>			
+			</where>
+			ORDER BY fb.free_id DESC
+		 LIMIT #{pageIndex}, #{pageSize}
+			
+</select>
+
+<!-- 자유게시판 총 건수 조회 -->
+<select id="boardCnt" resultType="int">
+	
+		SELECT
+				count(1)
+		   FROM tb_freeBoard
+			<where>
+			<if test="(title != null) and (!title.equals(''))">
+			and free_title LIKE CONCAT('%',#{title},'%')
+			</if>
+			<if test ="(from_date != null) and (!from_date.equals(''))">
+			    and free_regdate  <![CDATA[>=]]> STR_TO_DATE(#{from_date}, '%Y-%m-%d')   
+			</if>			
+			<if test ="(to_date != null) and (!to_date.equals(''))">
+			    and free_regdate  <![CDATA[<=]]> STR_TO_DATE(#{to_date}, '%Y-%m-%d')   
+			</if>			
+			</where>
+		ORDER BY free_id DESC
+
+</select>
+
+<!-- 자유게시판 단건 조회 -->
+<select id="boradDetail" resultType="kr.happyjob.study.community.model.FreeBoardModel">
+
+	SELECT
+				free_title as freeTitle
+			,	free_id as freeId	
+			,	free_content as freeContent
+		   ,    loginID
+	   FROM tb_freeBoard
+	 WHERE free_id = #{freeId}
+</select>
+
+<!-- 자유게시판 신규등록 -->
+<insert id="createBorad" parameterType="java.util.Map">
+<selectKey resultType="string" keyProperty="freeId" order="BEFORE">
+	SELECT IFNULL(MAX(free_id),0)+1
+	FROM tb_freeBoard
+</selectKey>
+	INSERT 
+		INTO tb_freeBoard
+				(
+				  	free_id
+				  , free_title
+				  , free_content
+				  , loginID
+				  , free_regdate
+				)
+		VALUES
+				(
+					#{freeId}		
+				, 	#{freeTitle}
+				,	#{freeContent}
+				,	#{swriter}
+				,	NOW()
+				)
+</insert>
+
+<!-- 자유게시판 업데이트 -->
+<update id="updateBorad" >
+	UPDATE tb_freeBoard 
+		  SET 	free_title = #{freeTitle}
+		  		,	free_content = #{freeContent}
+	WHERE free_id = #{freeId} 
+</update>
+
+<!-- 자유게시판 삭제 -->
+<delete id="deleteBoard">
+	DELETE 
+		FROM tb_freeBoard 
+	WHERE  free_id = #{freeId} 
+</delete>
+
+</mapper>
