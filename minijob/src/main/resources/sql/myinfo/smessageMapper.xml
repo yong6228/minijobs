@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.myinfo.dao.SMDao">
+
+	<!-- 로그인 정보 조회 -->
+	<select id="smessage1" resultType="kr.happyjob.study.myinfo.model.SMModel">
+		
+		select n.note_id
+      , u.loginID
+      , n.note_title
+      , n.note_date
+      , n.note_content
+      , n.send_id
+      , n.recd_id
+
+FROM tb_note n
+inner join tb_userinfo u on u.loginID = n.recd_id 
+
+ <where>
+ 
+          <if test="(searchvalue != null) and (!searchvalue.equals(''))">
+		 	AND u.loginID LIKE CONCAT('%', #{searchvalue}, '%')
+		 </if>
+           <if test="(startDate != null) and (!startDate.equals(''))">
+		 	AND n.note_date <![CDATA[ >= ]]>  #{startDate}
+		 </if>
+		 <if test="(endDate != null) and (!endDate.equals(''))">
+		 	AND n.note_date <![CDATA[ <= ]]> #{endDate}  
+		 </if>
+   </where>
+
+
+
+
+
+	limit #{startnum},#{pagesize}
+	</select>
+	
+	<select id="searchlistcnt" resultType="int">		
+																										<!--  총건수 구하기 -->		
+	select count(*)
+FROM tb_note n
+inner join tb_userinfo u on u.loginID = n.recd_id
+<where>
+
+          <if test="(searchvalue != null) and (!searchvalue.equals(''))">
+		 	AND u.loginID LIKE CONCAT('%', #{searchvalue}, '%')
+		 </if>
+           <if test="(startDate != null) and (!startDate.equals(''))">
+		 	AND n.note_date <![CDATA[ >= ]]>  #{startDate}
+		 </if>
+		 <if test="(endDate != null) and (!endDate.equals(''))">
+		 	AND n.note_date <![CDATA[ <= ]]> #{endDate}  
+		 </if>
+   </where>
+
+
+    </select>
+    
+    
+    
+    <select id="selectSS" resultType="kr.happyjob.study.myinfo.model.SMModel">
+    select n.note_id
+      , u.loginID
+      , n.note_title
+      , n.note_date
+      , n.note_content
+      , n.send_id
+      , n.recd_id
+
+FROM tb_note n
+inner join tb_userinfo u ON u.loginID = n.recd_id
+	    where  n.note_id = #{note_id}
+    </select>
+
+
+ <insert id="insertNotice0819">
+         <selectKey resultType="int" keyProperty="note_id" order="BEFORE"> <!-- note_id를 홈페이지내에서 자동으로 번호를 추가 하기 위함  -->
+            select ifnull(max(note_id),0) + 1 from tb_note 
+        </selectKey> 
+           insert into tb_note
+                        (
+                           note_id          
+                         , note_title   
+                            
+                         , note_content
+                         , note_date  
+                         , send_id 
+                         , recd_id 
+                        ) values (
+                          #{note_id} 
+                         ,#{note_title} 
+                       
+                         ,#{note_content} 
+                         ,now()
+                         ,#{send_id} 
+                         ,#{recd_id} 
+                        )
+    </insert>
+	
+	 <update id="updateNotice0819">
+          update tb_note
+               set note_title  =  #{note_title} 
+                    
+                  , note_content = #{note_content} 
+                  , note_date  = now()
+                 
+          where note_id = #{note_id} 
+    </update>
+    
+    <delete id="deleteNotice0819">
+          delete from tb_note
+          where note_id = #{note_id} 
+    </delete>   
+	
+	
+</mapper>
