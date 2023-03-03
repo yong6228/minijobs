@@ -4,249 +4,136 @@
 <mapper namespace="kr.happyjob.study.info.dao.PJDao">
 
 <select id="pjlist" resultType="kr.happyjob.study.info.model.PJModel">
-select projectID
-      ,corname				
-      ,swtype			
-      ,projectname		
-      ,area			
-      ,job			
-      ,industry		
-      ,recvstart			
-      ,recvend
-FROM tb_pjinfo
+
+select p.projectID
+      ,p.projectname
+      ,u.loginID
+      ,p.corname
+      ,p.area
+      ,p.job
+      ,p.industry
+      ,p.recvstart
+      ,p.recvend
+from tb_pjinfo p
+inner join tb_userinfo u on u.loginID = p.loginID
 <where>
-          		and loginID = 'admin'
 			<if test="(searchvalue != null) and (!searchvalue.equals(''))">
 				<choose>
 					<when
-						test="searchtype eq 'p'.toString()">
-						and projectname LIKE CONCAT('%', #{searchvalue}, '%')
+						test="searchtype eq 'pjn'.toString()">
+						and p.projectname LIKE CONCAT('%', #{searchvalue}, '%')
 					</when>
 					<when
-						test="searchtype eq 'a'.toString()">
-						and area LIKE CONCAT('%', #{searchvalue}, '%')
+						test="searchtype eq 'cn'.toString()">
+						and p.corname LIKE CONCAT('%', #{searchvalue}, '%')
 					</when>
 					<when
-						test="searchtype eq 'j'.toString()">
-						and job LIKE CONCAT('%', #{searchvalue}, '%')
+						test="searchtype eq 'area'.toString()">
+						and p.area LIKE CONCAT('%', #{searchvalue}, '%')
 					</when>
 					<when
-						test="searchtype eq 'i'.toString()">
-						and industry LIKE CONCAT('%', #{searchvalue}, '%')
+						test="searchtype eq 'recvend'.toString()">
+						and p.recvend LIKE CONCAT('%', #{searchvalue}, '%')
 					</when>
-				 
 					<otherwise>
 						AND (
-						            projectID LIKE CONCAT('%', #{searchvalue}, '%')
-						          or corname LIKE CONCAT('%', #{searchvalue}, '%')
-						          or swtype LIKE CONCAT('%', #{searchvalue}, '%')
-						          or projectname LIKE CONCAT('%', #{searchvalue}, '%')
-						          or area  LIKE CONCAT('%', #{searchvalue}, '%')
-						          or job LIKE CONCAT('%', #{searchvalue}, '%')
-						          or industry LIKE CONCAT('%', #{searchvalue}, '%')
-						           or recvstart LIKE CONCAT('%', #{searchvalue}, '%')
-						          or recvend LIKE CONCAT('%', #{searchvalue}, '%')
+						             p.projectname LIKE CONCAT('%', #{searchvalue}, '%')
+						          or p.corname LIKE CONCAT('%', #{searchvalue}, '%')
+						          or p.area LIKE CONCAT('%', #{searchvalue}, '%')
+						          or p.recvend LIKE CONCAT('%', #{searchvalue}, '%')
 						        )
 					</otherwise>
 				</choose>
 			</if>
-			 <if test ="(startDate != null) and (!startDate.equals(''))">
-             and recvstart  <![CDATA[>=]]> date_format(#{startDate}, '%Y-%m-%d')   
-         </if>         
-         <if test ="(endDate != null) and (!endDate.equals(''))">
-             and recvend  <![CDATA[<=]]> date_format(#{endDate}, '%Y-%m-%d')   
-         </if>         
-			
-		</where>
-		
-	limit #{startnum},#{pagesize}
+			<if test="(startDate != null) and (!startDate.equals(''))">
+		 	AND recvstart <![CDATA[ >= ]]>  #{startDate}
+		</if>
+		<if test="(endDate != null) and (!endDate.equals(''))">
+		 	AND recvend <![CDATA[ <= ]]> #{endDate}  
+		</if>
+	</where>
+ LIMIT #{startnum},#{pagesize}
 </select>
 
+<!-- 프로젝트 조회, 입력, 수정, 삭제 -->
 <select id="searchlistcnt" resultType="int">
 	select count(*)
-	FROM tb_pjinfo
+		from tb_pjinfo p
+	inner join tb_userinfo u on u.loginID = p.loginID
 	<where>
-          		and loginID = 'admin'
-			<if test="(searchvalue != null) and (!searchvalue.equals(''))">
+	<if test="(searchvalue != null) and (!searchvalue.equals(''))">
 				<choose>
 					<when
-						test="searchtype eq 'p'.toString()">
-						and projectname LIKE CONCAT('%', #{searchvalue}, '%')
+						test="searchtype eq 'pjn'.toString()">
+						and p.projectname LIKE CONCAT('%', #{searchvalue}, '%')
 					</when>
 					<when
-						test="searchtype eq 'a'.toString()">
-						and area LIKE CONCAT('%', #{searchvalue}, '%')
+						test="searchtype eq 'cn'.toString()">
+						and p.corname LIKE CONCAT('%', #{searchvalue}, '%')
 					</when>
 					<when
-						test="searchtype eq 'j'.toString()">
-						and job LIKE CONCAT('%', #{searchvalue}, '%')
+						test="searchtype eq 'area'.toString()">
+						and p.area LIKE CONCAT('%', #{searchvalue}, '%')
 					</when>
 					<when
-						test="searchtype eq 'i'.toString()">
-						and industry LIKE CONCAT('%', #{searchvalue}, '%')
-					 
-		 	</when>	
+						test="searchtype eq 'recvend'.toString()">
+						and p.recvend LIKE CONCAT('%', #{searchvalue}, '%')
+					</when>
 					<otherwise>
 						AND (
-						            projectID LIKE CONCAT('%', #{searchvalue}, '%')
-						          or corname LIKE CONCAT('%', #{searchvalue}, '%')
-						          or swtype LIKE CONCAT('%', #{searchvalue}, '%')
-						          or projectname LIKE CONCAT('%', #{searchvalue}, '%')
-						          or area  LIKE CONCAT('%', #{searchvalue}, '%')
-						          or job LIKE CONCAT('%', #{searchvalue}, '%')
-						          or industry LIKE CONCAT('%', #{searchvalue}, '%')
-						           or recvstart LIKE CONCAT('%', #{searchvalue}, '%')
-						          or recvend LIKE CONCAT('%', #{searchvalue}, '%')
+						             p.projectname LIKE CONCAT('%', #{searchvalue}, '%')
+						          or p.corname LIKE CONCAT('%', #{searchvalue}, '%')
+						          or p.area LIKE CONCAT('%', #{searchvalue}, '%')
+						          or p.recvend LIKE CONCAT('%', #{searchvalue}, '%')
 						        )
 					</otherwise>
 				</choose>
 			</if>
-			 <if test ="(startDate != null) and (!startDate.equals(''))">
-             and recvstart  <![CDATA[>=]]> date_format(#{startDate}, '%Y-%m-%d')   
-         </if>         
-         <if test ="(endDate != null) and (!endDate.equals(''))">
-             and recvend  <![CDATA[<=]]> date_format(#{endDate}, '%Y-%m-%d')   
-         </if>         
+			<if test="(startDate != null) and (!startDate.equals(''))">
+		 	AND recvstart <![CDATA[ >= ]]>  #{startDate}
+		</if>
+		<if test="(endDate != null) and (!endDate.equals(''))">
+		 	AND recvend <![CDATA[ <= ]]> #{endDate}  
+		</if>
 		</where>
-		
-</select>
-
-<!-- 프로젝트 조회 -->
-<select id="selectlist" resultType="kr.happyjob.study.info.model.PJModel">
-	
-   select	p.corname
-		,p.first
-		,p.mid
-		,p.high
-		,p.special
-		, p.projectID
-      ,p.loginID
-      ,p.projectname 
-      ,p.area		
-      ,p.job		
-      ,p.industry		
-      ,p.swtype		
-      ,p.recvstart		
-      ,p.recvend		
-      ,p.workstart 
-      ,p.workend		
-      ,p.note		
-      ,p.prime		
-      ,p.etc		
-      ,p.workareadetail	
-      ,p.notebookyn	
-      ,p.houseyn		
-      ,p.foodyn		
-      ,ui.corp_name
-      ,(select group_concat(detail_code)
-      from tb_pjskill pj 
-      inner join tb_pjinfo p on p.projectID = pj.projectID
-      where  pj.projectID = #{projectID})as detail
-from tb_pjinfo p 
-inner join tb_userinfo ui ON ui.loginID = p.loginID 
-where  p.projectID = #{projectID}
-
-
-
 	
 </select>
 
-<!-- 프로젝트 입력, 수정, 삭제 -->
-<insert id="insertNotice">
-	
-	<selectKey resultType="string" keyProperty="projectID" order="BEFORE">
-	    SELECT IFNULL(MAX(projectID),0) + 1  FROM tb_pjinfo
-	</selectKey>
-	INSERT INTO tb_pjinfo 
-	(
-		projectID,
-		loginID,
-		projectname,
-		corname,
-		area,
-		job,
-		industry,
-		swtype,
-		first,
-		mid,
-		high,
-		special,
-		workstart,
-		workend,
-		recvstart,
-		recvend,
-		note,
-		prime,
-		etc,
-		workarea,
-		workareadetail,
-		notebookyn,
-		houseyn,
-		foodyn
-	)
-	VALUES
-	(
-		#{projectID},
-		#{loginID},
-		#{projectname},
-		#{corname},
-		#{rgareaall},
-		#{rgjoball},
-		#{rgindustryall},
-		#{swcdall},
-		#{first},
-		#{mid},
-		#{high},
-		#{special},
-		#{workstart},
-		#{workend},
-		#{recvstart},
-		#{recvend},
-		#{note},
-		#{prime},
-		#{etc},
-		#{workareaall},
-		#{workareadetail},
-		#{rgnotebookyn},
-		#{rghouseyn},
-		#{rgfoodyn}
-	)
-</insert>
+<!-- 프로젝트 조회, 입력, 수정, 삭제 -->
+<select id="selectpjlist" resultType="kr.happyjob.study.info.model.PJModel">
+	select l.projectID
+      ,p.projectname
+      ,u.loginID
+      ,p.corname
+      ,p.area
+      ,p.job
+      ,p.industry
+      ,p.swtype
+      ,p.first
+      ,p.mid
+      ,p.high
+      ,p.special
+      ,p.workstart
+      ,p.workend
+      ,p.note
+      ,p.prime
+      ,p.etc
+      ,p.workarea
+      ,p.workareadetail
+      ,p.notebookyn
+      ,p.foodyn
+      ,p.houseyn
+      ,p.recvstart
+      ,p.recvend
+      ,group_concat(detail_code)as detail
+      ,i.interviewtype
+from tb_pjinfo p
+inner join tb_userinfo u on p.loginID = u.loginID
+inner join tb_pjskill l on l.projectID = p.projectID
+inner join tb_interview i on i.projectID = p.projectID
 
-<update id="updateNotice">
+	WHERE p.projectID = #{projectID}
+</select>
 
-	UPDATE tb_pjinfo
-	SET
-		projectname = #{projectname},
-		corname = #{corname},
-		area = #{rgareaall},
-		job = #{rgjoball},
-		industry = #{rgindustryall},
-		swtype = #{swcdall},
-		first = #{first},
-		mid = #{mid},
-		high = #{high},
-		special = #{special},
-		workstart = #{workstart},
-		workend = #{workend},
-		recvstart = #{recvstart},
-		recvend = #{recvend},
-		note = #{note},
-		prime = #{prime},
-		etc = #{etc},
-		workarea = #{workareaall},
-		workareadetail = #{workareadetail},
-		notebookyn = #{rgnotebookyn},
-		houseyn = #{rghouseyn},
-		foodyn = #{rgfoodyn}
-	WHERE loginID = #{loginID} AND projectID = #{projectID}
-</update>
-
-
-<delete id="deleteNotice">
-	
-	DELETE FROM tb_pjinfo 
-	WHERE loginID = #{loginID} AND projectID = #{projectID}
-</delete>
 
 </mapper>

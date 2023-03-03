@@ -11,9 +11,9 @@
 							<c:if test="${searchlistcnt > 0 }">
 								<c:forEach items="${searchlist}" var="list">
 									<tr>
-										<td><a href="javascript:fselectone(${list.projectID})">${list.corname}</a></td>
-										<td>${list.swtype}</td>
-										<td>${list.projectname}</td>
+										<td>${list.projectID}</td>
+										<td><a href="javascript:pselectone(${list.projectID})">${list.projectname}</a></td>
+										<td>${list.corname}</td>
 										<td>${list.area}</td>
 										<td>${list.job}</td>
 										<td>${list.industry}</td>

@@ -13,16 +13,9 @@
 <jsp:include page="/WEB-INF/view/info/projectlist_detail.jsp"></jsp:include>
 
 <script type="text/javascript">
-	
 var pagesize = 10;
 var pagenumsize = 10;
-
-var today = new Date();   
-
-var year = today.getFullYear(); // 년도
-var month = today.getMonth() + 1;  // 월
-var date = today.getDate();  // 날짜 
-
+	
 /** OnLoad event */ 
 $(function() {
 
@@ -30,6 +23,8 @@ $(function() {
 	PJ();
 	
 	PButtonClickEvent();
+	
+	
 	
 	$("#searchvalue").keydown(function (key) {
         if (key.keyCode == 13) {
@@ -39,7 +34,7 @@ $(function() {
 $("#searchvalue").focus();
 
 });
-
+	
 /** 버튼 이벤트 등록 */
 function PButtonClickEvent() {
 	$('a[name=btn]').click(function(e) {
@@ -52,34 +47,34 @@ function PButtonClickEvent() {
 				PJ();
 				break;
 			case 'btnSave' :  // 수정버튼
-				updatedelete();
+				등록수정();
 				break;					
 			case 'btnInsert' :  //신규 등록 버튼
-				updatedelete();
+				등록수정();
 				break;
 			case 'btnClose' : // 목록보기 버튼
 				gfCloseModal();
 				break;	
 			case 'btnDelete' : // 삭제 버튼
 				$("#action").val("D"); // action html에 input타입에서 컨트롤러로 보내주고있음
-				updatedelete();
+				등록수정();
 				break;		
 		}
 	});
 }
 
-
-
-
 function PJ(clickpagenum) {
-	
+	console.log("검색 리스트 확인");
 	clickpagenum = clickpagenum || 1;
 	
 	var param = {
+			loginID : $("#loginID").val() ,
+			projectID : $("#projectID").val() ,
 			startDate : $("#startDate").val() ,
 			endDate : $("#endDate").val() ,
 			searchtype : $("#searchtype").val() ,
 			searchvalue : $("#searchvalue").val() ,
+			
 			clickpagenum : clickpagenum,
 			pagesize : pagesize
 	};
@@ -109,161 +104,120 @@ function searchcallbackprocess(returndata,clickpagenum) {
 	
 	$("#hclickpagenum").val(clickpagenum);
 }
-
-
 	
-function fPopModal() {		// 신규등록 버트에 모달
+	
+function pPopModal() {		// 신규등록 버트에 모달
 	$("#action").val("I");
 	
-	superinit();
+	PJ_forminit();
 	
-	gfModalPop("#layer5");
+	gfModalPop("#layer7");
 }  
-	
-function superinit(object) {
-	
+
+function PJ_forminit(object) {
+	console.log("모달창에 데이터를 뿌려봅니다~!");
 	if (object == null || object=="") {
-		$("#projectID").val(""); // 플젝 번호
-		$("#corname").val(""); // 회사명
-		$("#first").val(""); // 초급
-		$("#mid").val(""); // 중급
-		$("#high").val(""); // 고급
-		$("#special").val(""); // 특급
-		$("#swtype").val(""); // 회사 구분
-		$("#projectname").val(""); //프로젝트이름
-		$("#area").val(""); // 지역
-		$("#job").val(""); // 직무
-		$("#industry").val(""); // 산업
-		$("#recvstart").val(""); // 모집시작일
-		$("#recvend").val(""); // 모집마감일
-		$("#workstart").val(""); // 근무시작일
-		$("#workend").val(""); // 근무마감일
-		$("#note").val(""); // 상새설명
-		$("#prime").val(""); // 필수 우대 사항
-		$("#etc").val(""); // 특이사항
-		$("#workareadetail").val(""); // 근무장소
-		$("#notebookyn").val(""); // 장비지원
-		$("#houseyn").val(""); // 숙박제공
-		$("#foodyn").val(""); //식사제공
-		$("#corp_name").val(""); //파견회사
+		console.log("값이 있는지 없는지 테스트");
+		$("#projectID").val(""); // 프로젝트 번호
+		$("#projectname").val(""); // 프로젝트 이름
+		$("#loginID").val("");
+		$("#corname").val("");
+		$("#area").val("");
+		$("#job").val("");
+		$("#industry").val("");
+		$("#swtype").val("");
+		$("#first").val("");
+		$("#mid").val("");
+		$("#high").val("");
+		$("#special").val("");
+		$("#workstart").val("");
+		$("#workend").val("");
+		$("#note").val("");
+		$("#prime").val("");
+		$("#etc").val("");
+		$("#workarea").val("");
+		$("#workareadetail").val("");
+		$("input:radio[name=notebookyn]:radio[value='Y']").attr("checked", true);
+		$("input:radio[name=houseyn]:radio[value='Y']").attr("checked", true);
+		$("input:radio[name=foodyn]:radio[value='Y']").attr("checked", true);
+		$("#recvstart").val("");
+		$("#recvend").val("");
+		$("#detail").val("");
+		$("#interviewtype").val("");
 		
 		
-	
+		$("#btnApply").hide(); // 지원버튼
 		$("#btnDelete").hide(); // 삭제버튼
 		$("#btnSave").hide();  // 수정버튼
-	
-		$("#btnInsert").show();
+		
+		$("#btnInsert").show(); //등록
 	
 		
 		$("#projectname").focus();
 	} else {
-	
-		$("#projectID").val(object.projectID); // 플젝 번호
-		$("#corname").val(object.corname); // 회사명
-		$("#swtype").val(object.swtype); // 회사 구분
+		
+		console.log("else 값 들어가나 확인합니다");
+		
+		$("#projectID").val(object.projectID); // 프로젝트 번호
+		$("#projectname").val(object.projectname); // 프로젝트 이름
+		$("#loginID").val(object.loginID); // 로그인;
+		$("#corname").val(object.corname); // 회사이름
+		$("#area").val(object.area); // 지역
+		$("#job").val(object.job); // 직무
+		$("#industry").val(object.industry); // 산업 
+		$("#swtype").val(object.swtype); // 구분
 		$("#first").val(object.first); // 초급
 		$("#mid").val(object.mid); // 중급
 		$("#high").val(object.high); // 고급
 		$("#special").val(object.special); // 특급
-		$("#projectname").val(object.projectname); //프로젝트이름
-		$("#area").val(object.area); // 지역
-		$("#job").val(object.projectID); // 직무
-		$("#industry").val(object.job); // 산업
-		$("#recvstart").val(object.recvstart); // 모집시작일
-		$("#recvend").val(object.recvend); // 모집마감일
-		$("#workstart").val(object.workstart); // 근무시작일
-		$("#workend").val(object.workend); // 근무마감일
-		$("#note").val(object.note); // 상새설명
-		$("#prime").val(object.prime); // 필수 우대 사항
+		$("#workstart").val(object.workstart); // 일시작일
+		$("#workend").val(object.workend); // 일끝내는일
+		$("#note").val(object.note); // 상세설명
+		$("#prime").val(object.prime); // 우대사항
 		$("#etc").val(object.etc); // 특이사항
-		$("#workareadetail").val(object.workareadetail); // 근무장소
-		$("#notebookyn").val(object.notebookyn); // 장비지원
+		$("#workarea").val(object.workarea); // 일하는곳
+		$("#workareadetail").val(object.workareadetail); // 상세주소
+		$("#notebookyn").val(object.notebookyn); // 장비지원 
+		$("#foodyn").val(object.foodyn); // 식사제공
 		$("#houseyn").val(object.houseyn); // 숙박제공
-		$("#foodyn").val(object.foodyn); //식사제공
+		$("#recvstart").val(object.recvstart); // 접수기간 시작
+		$("#recvend").val(object.recvend); // 접수기간 종료
+		$("#detail").val(object.detail); // 전문기술
+		$("#interviewtype").val(object.interviewtype); // 인터뷰 타입
+		
 		
 		$("#btnSave").show();  // 수정버튼
 		$("#btnDelete").show(); // 삭제버튼
 		$("#btnInsert").hide(); // 등록버튼
-		$("#corp_name").val(object.corp_name); //파견회사
+		$("#btnApply").hide(); // 지원버튼
+		$("#projectname").hide(); // 제목
 		
 	
 	}
 }
 
+
 //단건조회 함수
-function fselectone(projectID) {
-	
+function pselectone(projectID) {
+	console.log("단건 조회 함수");
 	var param = {
 			projectID : projectID
 	}
 
 
-	var resultcall = function( datas ) {
-		console.log(JSON.stringify(datas));
-		//console.log(JSON.stringify(selectonersn.searchone));
+	var searchAll = function( selectoneALL ) {
+		console.log(JSON.stringify(selectoneALL));
+		//console.log(JSON.stringify(selectoneALL.searchone + "이거 문제 있나요?"));
 		
 		$("#action").val("U");			
-		superinit(datas.searchone);
+		PJ_forminit(selectoneALL.searchone);
 		
-		gfModalPop("#layer5");
+		gfModalPop("#layer7");
 	
 }
-	
-callAjax("/info/selectlist.do", "post", "json", true, param, resultcall);
+	callAjax("/info/selectpjlist.do", "post", "json", true, param, searchAll);
 }
 
-
-//업데이트(등록,수정) 하는  메소드
-function updatedelete() {
-	
-	var param = {
-			projectID : $("#projectID").val(),
-			corname : $("#corname").val(),
-			swtype : $("#swtype").val(),
-			first : $("#first").val(),
-			mid : $("#mid").val(),
-			high : $("#high").val(),
-			special : $("#special").val(),
-			projectname : $("#projectname").val(),
-			area : $("#area").val(),
-			job : $("#job").val(),
-			industry : $("#industry").val(),
-			recvstart : $("#recvstart").val(),
-			recvend : $("#recvend").val(),
-			workstart : $("#workstart").val(),
-			workend : $("#workend").val(),
-			note : $("#note").val(),
-			prime : $("#prime").val(),
-			workareadetail : $("#workareadetail").val(),
-			notebookyn : $("#notebookyn").val(),
-			houseyn : $("#houseyn").val(),
-			foodyn : $("#foodyn").val(),
-			etc : $("#etc").val(),
-			corp_name : $("#corp_name").val()
-			
-			
-			
-			
-	};
-	
-	var savecallback= function(rtn) {
-		console.log(JSON.stringify(rtn));
-		
-		alert("저장 하시겠습니까?");
-		
-		gfCloseModal();
-		
-		var savepageno = 1;
-		
-		if($("#action").val() == "U") {
-			savepageno = $("#hclickpagenum").val();
-		}
-		
-		PJ(savepageno);
-		
-	}
-	callAjax("/info/savelist.do", "post", "json", true,  $("#myForm").serialize(), savecallback);
-}
 
 
 </script>
@@ -273,9 +227,9 @@ function updatedelete() {
 <form id="myForm" action=""  method="">
 	<input type="hidden" id="hclickpagenum" name="hclickpagenum"  value="" />
 	<input type="hidden" id="action" name="action"  value="" />
-	<input type="hidden" id="projectID" name="projectID"  value="${projectID}" />
-	<input type="hidden" id="loginID" value="${loginId}">
-	<input type="hidden" id="sortflag" value="1">
+	<input type="hidden" id="projectID" name="projectID"  value="" />
+	<input type="hidden" id="loginID" value="${loginID}">
+
 	
 	
 	<!-- 모달 배경 -->
@@ -301,7 +255,7 @@ function updatedelete() {
 		               
 		               <p class="Location">
 		                     <a href="../dashboard/dashboard.do" class="btn_set home">메인으로</a> <span
-		                        class="btn_nav bold">정보 목록</span> <span class="btn_nav bold">프로젝트 목록</span> <a href="../system/comnCodMgr.do" class="btn_set refresh">새로고침</a>
+		                        class="btn_nav bold">정보목록</span> <span class="btn_nav bold">프로젝트 목록</span> <a href="../system/comnCodMgr.do" class="btn_set refresh">새로고침</a>
 		                  </p>
 		
 		                  <p class="conTitle" style="height:100px;">
@@ -309,21 +263,16 @@ function updatedelete() {
 		                     
 		                     <select id="searchtype" name="searchtype" style="width: 150px;" >
 			                     <option value="" >전체</option>
-			                     <option value="p">프로젝트</option>
-			                     <option value="a">지역</option>
-			                     <option value="j">직무</option>
-			                     <option value="i">산업</option>
-			         
+			                     <option value="pjn">프로젝트이름</option>
+			                     <option value="cn">회사이름</option>
+			                      <option value="area">지역</option>
+			                     <option value="recvend">마감일</option>
 		                  	</select>
-		                  	접수기간 :
-		                  	<input type="date" id="startDate" name="startDate" style="width:100px;height:20px; text-align:center;"> ~
+		                   <input type="date" id="startDate" name="startDate" style="width:100px;height:20px; text-align:center;"> ~
 							<input type="date" id="endDate" name="endDate" style="width:100px;height:20px; text-align:center; margin-right:30px;">
-		                 
-		              
-		                   
 		                  <input type="text" id="searchvalue" name="searchvalue" style="width: 180px; height: 28px;margin:10px 10px;">
 		                  	<a href="" class="btnType blue" id="btnSearch" name="btn"><span>검  색</span></a><br>
-		                  <a class="btnType blue" style= "float:right" href="javascript:fPopModal();" name="modal"><span>신규등록</span></a>
+		                      <a class="btnType blue" style= "float:right" href="javascript:pPopModal();" ><span>신규등록</span></a>
 		                     </span>
 		                  </p>
 	                           
@@ -331,27 +280,26 @@ function updatedelete() {
 							<table class="col" id="dateDay">
 								<caption>caption</caption>
 								<colgroup>
+									<col width="12%">
+									<col width="25%">
 									<col width="10%">
-									<col width="10%">
-									<col width="20%">
-									<col width="10%">
-									<col width="10%">
-									<col width="10%">
-									<col width="15%">
-									<col width="15%">
-									
+									<col width="5%">
+									<col width="5%">
+									<col width="8%">
+									<col width="22.5%">
+									<col width="22.5%">
 								</colgroup>
 								
 								<thead>
 									<tr>
-										<th scope="col">회사</th>
-										<th scope="col">구분</th>
-										<th scope="col">프로젝트</th>
+									<th scope="col">프로젝트 번호</th>
+										<th scope="col">프로젝트 이름</th>
+										<th scope="col">회사명</th>
 										<th scope="col">지역</th>
 										<th scope="col">직무</th>
 										<th scope="col">산업</th>
-										<th scope="col">모집시작일</th>
-										<th scope="col">모집마감일</th>
+										<th scope="col">작성일</th>
+										<th scope="col">모집마감</th>
 									</tr>
 								</thead>
 								<tbody id="pjlist"></tbody>
@@ -371,8 +319,8 @@ function updatedelete() {
 		</div>
 	</div>
  
- 		<!-- 모달팝업 -->
-<div id="layer5" class="layerPop layerType2" style="overflow:scroll;  height : 800px; width: 1000px;">
+  	<!-- 모달팝업 -->
+<div id="layer7" class="layerPop layerType1" style="overflow:scroll; height:800px; width: 1000px; ">
 		<dl>
 			<dt>
 				<strong>프로젝트 상세정보</strong>
@@ -382,6 +330,11 @@ function updatedelete() {
 				<!-- s : 여기에 내용입력 -->
 				<table class="row">
 					<caption>caption</caption>
+					<colgroup>
+						<col width="300px">
+						<col width="*">
+					</colgroup>
+
 					<tbody>
 					<tr class="hidden">
 						<th>아이디</th>
@@ -391,38 +344,38 @@ function updatedelete() {
 							</td>
 						</tr>
 						<tr>
-							<th>회사명 <span class="font_red">*</span></th>
-							<td colspan="4">
-								<input type="text" class="inputTxt p100" name="corname" id="corname" />
-							</td>
 							<th>프로젝트명 <span class="font_red">*</span></th>
-							<td colspan="4">
-								<input type="text" class="inputTxt p100" name="projectname" id="projectname" />
+							<td colspan="8">
+								<input type="text" class="inputTxt p1000" name="projectname" id="projectname" />
 							</td>
 						</tr>
-						
 						<tr>
-							<th rowspan="2">상세 <span class="font_red">*</span></th>
+							<th>회사명 <span class="font_red">*</span></th>
+							<td colspan="8">
+								<input type="text" class="inputTxt p1000" name="corname" id="corname" />
+							</td>
+						</tr>
+						<tr>
+							<th rowspan="2">선택 <span class="font_red">*</span></th>
 							<td class="a">지역</td>
 							<td colspan="3">
-								<input type="text" class="inputTxt p100" name="area" id="area" />
+								<input type="text" class="inputText" name="area" id="area" /> 
 							</td>
 							<td class="a">직무</td>
 							<td colspan="3">
-								<input type="text" class="inputTxt p100" name="job" id="job" />
+								<input type="text" class="inputText" name="job" id="job" /> 
 							</td>
 						</tr>
 						<tr>
 							<td class="a">산업</td>
 							<td colspan="3">
-								<input type="text" class="inputTxt p100" name="industry" id="industry" />
+								<input type="text" class="inputText" name="industry" id="industry" /> 
 							</td>
 							<td class="a">구분</td>
 							<td colspan="3">
-								<input type="text" class="inputTxt p100" name="swtype" id="swtype" />
+								<input type="text" class="inputText" name="swtype" id="swtype" /> 
 							</td>   
 						</tr>
-						
 						<tr>
 							<th>기술등급 <span class="font_red">*</span></th>
 							<td class="a">초급</td>
@@ -460,77 +413,13 @@ function updatedelete() {
 								<input type="text" class="inputText dates" name="workend" id="workend" style="font-size: 15px" />
 							</td>
 						</tr>
-						<tr>
-							<th>전문기술<span class="font_red">*</span></th>
-							<td colspan="8">
-								<div class="detail">
-									<table class="row4">
-										<tr>
-										<th>Language<span class = "font_red"></span></th>
-												<td colspan="2">
-												<table>
-												
-													<input type="text" class="inputText" name="detail" id="detail" style="font-size: 15px" />
-												
-												</table>
-												</td>
-										
-										
-										<th>Language<span class = "font_red"></span></th>
-												<td colspan="2">
-												<table>
-												
-														<input type="text" class="inputText" name="detail" id="detail" style="font-size: 15px" />
-														
-												</table>
-												</td>
-										</tr>
-									<tr>
-										<th>Language<span class = "font_red"></span></th>
-												<td colspan="2">
-												<table>
-												
-														<input type="text" class="inputText" name="detail" id="detail" style="font-size: 15px" />
-												
-												</table>
-												</td>
-										
-										
-										<th>Language<span class = "font_red"></span></th>
-												<td colspan="2">
-												<table>
-												
-														<input type="text" class="inputText" name="detail" id="detail" style="font-size: 15px" />
-														
-												</table>
-												</td>
-										</tr>
-										<tr>
-										<th>Language<span class = "font_red"></span></th>
-												<td colspan="2">
-												<table>
-												
-														<input type="text" class="inputText" name="detail" id="detail" style="font-size: 15px" />
-												
-												</table>
-												</td>
-										
-										
-										<th>Language<span class = "font_red"></span></th>
-												<td colspan="2">
-												<table>
-												
-														<input type="text" class="inputText" name="detail" id="detail" style="font-size: 15px" >
-														
-												</table>
-												</td>
-										</tr>
-									
-									</table>
-								</div>
-							</td>
-						</tr>
 						
+						<tr>
+							<th>전문기술 <span class="font_red">*</span></th>
+							<td colspan="8">
+							     <input type="text" class="inputTxt p1000" name="detail" id="detail" style="font-size: 15px" />
+						   </td>
+						</tr>
 						<tr>
 							<th>상세설명 <span class="font_red">*</span></th>
 							<td colspan="8">
@@ -552,37 +441,37 @@ function updatedelete() {
 						<tr>
 						<th>근무장소 <span class="font_red">*</span></th>
 							<td colspan="9">
-								<select id="workareaall" name="workareaall"></select>&nbsp;&nbsp;<input type="text" class="inputText" name="workareadetail" id="workareadetail" /> 구/읍/면
+							<input type="text" class="inputText" name="workareadetail" id="workareadetail" /> 구/읍/면
 							</td>
 						</tr>
-						<tr>
+					<tr>
 							<th>장비지원<span class="font_red">*</span></th>
 							<td colspan="8">
-								<input type="radio" id="notebookyn1" name="rgnotebookyn" value="Y" /> <label for="radio1-1">지원</label>
+								<input type="radio" id="notebookyn1" name="notebookyn" value="Y" /> <label for="radio1-1">지원</label>
 								&nbsp;&nbsp;
-								<input type="radio" id="notebookyn2" name="rgnotebookyn" value="N" /> <label for="radio1-2">미지원</label>
+								<input type="radio" id="notebookyn2" name="notebookyn" value="N" /> <label for="radio1-2">미지원</label>
 								&nbsp;&nbsp;
-								<input type="radio" id="notebookyn3" name="rgnotebookyn" value="M" /> <label for="radio1-3">추후협의</label>
+								<input type="radio" id="notebookyn3" name="notebookyn" value="M" /> <label for="radio1-3">추후협의</label>
 							</td>
 						</tr>
 						<tr>
 							<th>숙박제공 <span class="font_red">*</span></th>
 							<td colspan="8">
-								<input type="radio" id="houseyn1" name="rghouseyn" value="Y" /> <label for="radio1-1">지원</label>
+								<input type="radio" id="houseyn1" name="houseyn" value="Y" /> <label for="radio1-1">지원</label>
 								&nbsp;&nbsp;
-								<input type="radio" id="houseyn2" name="rghouseyn" value="N" /> <label for="radio1-2">미지원</label>
+								<input type="radio" id="houseyn2" name="houseyn" value="N" /> <label for="radio1-2">미지원</label>
 								&nbsp;&nbsp;
-								<input type="radio" id="houseyn3" name="rghouseyn" value="M" /> <label for="radio1-3">추후협의</label>
+								<input type="radio" id="houseyn3" name="houseyn" value="M" /> <label for="radio1-3">추후협의</label>
 							</td>
 						</tr>
 						<tr>
 							<th>식사제공 <span class="font_red">*</span></th>
 							<td colspan="8">
-								<input type="radio" id="foodyn1" name="rgfoodyn" value="Y" /> <label for="radio1-1">지원</label>
+								<input type="radio" id="foodyn1" name="foodyn" value="Y" /> <label for="radio1-1">지원</label>
 								&nbsp;&nbsp;
-								<input type="radio" id="foodyn2" name="rgfoodyn" value="N" /> <label for="radio1-2">미지원</label>
+								<input type="radio" id="foodyn2" name="foodyn" value="N" /> <label for="radio1-2">미지원</label>
 								&nbsp;&nbsp;
-								<input type="radio" id="foodyn3" name="rgfoodyn" value="M" /> <label for="radio1-3">추후협의</label>
+								<input type="radio" id="foodyn3" name="foodyn" value="M" /> <label for="radio1-3">추후협의</label>
 							</td>
 						</tr>
 						<tr>
@@ -593,31 +482,28 @@ function updatedelete() {
 								<input type="checkbox" id="join" name="join">직접면접
 							</td>
 						</tr>
-						<tr>
-							<th>작성회사</th>
-							<td colspan="8">
-								<input type="text" class="inputTxt p100" name="corp_name" id="corp_name" />
-							</td>
-						</tr>
+						
 					</tbody>
 				</table>
 
 				<!-- e : 여기에 내용입력 -->
 
-				<div class="btn_areaC mt30">
+				<div class="btn_areaC mt30" style="display:flex; justify-content:space-between;">
+					<a href="" class="btnType gray" id="btnClose" name="btn"><span>목록보기</span></a> 
+					<span>
 					<a href="" class="btnType blue" id="btnSave" name="btn"><span>저장</span></a>
 					<a href="" class="btnType blue" id="btnDelete" name="btn"><span>삭제</span></a>
-					<a href="" class="btnType blue" id="btnApplyProCod" name="btn"><span>지원하기</span></a>
+					<a href="" class="btnType blue" id="btnApply" name="btn"><span>지원하기</span></a>
 					<a href=""	class="btnType gray"  id="btnClose" name="btn"><span>취소</span></a>
+					</span> 
 				</div>
 			</dd>
 		</dl>
 		<a href="" class="closePop"><span class="hidden">닫기</span></a>
-	</div>
+	</div> 
+
+	<!--// 모달팝업 -->
 </form>
-
-
-
 </body>
 </html>
 
